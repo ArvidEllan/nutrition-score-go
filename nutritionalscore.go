@@ -1,167 +1,83 @@
 package main
 
-// ScoreType represents different types of food/beverage categories for nutritional scoring
-// This enum is used to apply different scoring rules based on the food category
-type ScoreType int
-
-const (
-	Food     ScoreType = iota // Regular food items
-	Beverage                  // Liquid beverages
-	Water                     // Water (special case with no scoring)
-	Cheese                    // Cheese products (may have different scoring rules)
+import (
+	"nutritional-score/internal/core"
+	"nutritional-score/pkg/models"
 )
 
-// NutritionalScore holds the calculated nutritional score and its components
-// This struct contains the final score calculation results and breakdown
-type NutritionalScore struct {
-	Value     int       // Final calculated score (negative - positive)
-	Positive  int       // Sum of positive nutritional points (beneficial nutrients)
-	Negative  int       // Sum of negative nutritional points (nutrients to limit)
-	ScoreType ScoreType // Category of the food/beverage being scored
-}
+// Legacy type aliases for backward compatibility with existing main.go
+// These will be replaced when we update the main application structure
+type ScoreType = models.ScoreType
+type NutritionalScore = models.NutritionalScore
+type NutritionalData = models.NutritionalData
 
-// EnergyKJ represents energy content in kilojoules
-// Higher energy content contributes to negative (unhealthy) points
-type EnergyKJ float64
+// Legacy constants for backward compatibility
+const (
+	Food     = models.FoodType
+	Beverage = models.BeverageType
+	Water    = models.WaterType
+	Cheese   = models.CheeseType
+)
 
-// GetPoints calculates negative points based on energy content
-// Uses simplified thresholds - will be enhanced with official Nutri-Score algorithm later
-func (e EnergyKJ) GetPoints() int {
-	// Placeholder logic - simplified scoring for now
-	// Higher energy = more negative points
-	if e > 1000 {
-		return 5
-	}
-	return 1
-}
+// Legacy type aliases for nutritional components
+// These maintain backward compatibility while using the new models
+type EnergyKJ = models.EnergyKJ
+type SugarGram = models.SugarGram
+type SaturatedFattyAcids = models.SaturatedFattyAcids
+type SodiumMilligram = models.SodiumMilligram
+type FruitsPercent = models.FruitsPercent
+type FibreGram = models.FibreGram
+type ProteinGram = models.ProteinGram
 
-// SugarGram represents sugar content in grams
-// Higher sugar content contributes to negative (unhealthy) points
-type SugarGram float64
-
-// GetPoints calculates negative points based on sugar content
-// Simplified scoring - will be enhanced with official thresholds later
-func (s SugarGram) GetPoints() int {
-	// Higher sugar = more negative points
-	if s > 10 {
-		return 5
-	}
-	return 1
-}
-
-// SaturatedFattyAcids represents saturated fat content in grams
-// Higher saturated fat contributes to negative (unhealthy) points
-type SaturatedFattyAcids float64
-
-// GetPoints calculates negative points based on saturated fatty acids content
-// Simplified scoring - will be enhanced with official thresholds later
-func (s SaturatedFattyAcids) GetPoints() int {
-	// Higher saturated fat = more negative points
-	if s > 5 {
-		return 5
-	}
-	return 1
-}
-
-// SodiumMilligram represents sodium content in milligrams
-// Higher sodium content contributes to negative (unhealthy) points
-type SodiumMilligram float64
-
-// GetPoints calculates negative points based on sodium content
-// Simplified scoring - will be enhanced with official thresholds later
-func (s SodiumMilligram) GetPoints() int {
-	// Higher sodium = more negative points
-	if s > 500 {
-		return 5
-	}
-	return 1
-}
-
-// FruitsPercent represents the percentage of fruits/vegetables/nuts
-// Higher fruit/vegetable content contributes to positive (healthy) points
-type FruitsPercent float64
-
-// GetPoints calculates positive points based on fruits/vegetables/nuts percentage
-// Simplified scoring - will be enhanced with official thresholds later
-func (f FruitsPercent) GetPoints() int {
-	// Higher fruit/vegetable percentage = more positive points
-	if f > 80 {
-		return 5
-	}
-	return 1
-}
-
-// FibreGram represents fiber content in grams
-// Higher fiber content contributes to positive (healthy) points
-type FibreGram float64
-
-// GetPoints calculates positive points based on fiber content
-// Simplified scoring - will be enhanced with official thresholds later
-func (f FibreGram) GetPoints() int {
-	// Higher fiber = more positive points
-	if f > 5 {
-		return 5
-	}
-	return 1
-}
-
-// ProteinGram represents protein content in grams
-// Higher protein content contributes to positive (healthy) points
-type ProteinGram float64
-
-// GetPoints calculates positive points based on protein content
-// Simplified scoring - will be enhanced with official thresholds later
-func (p ProteinGram) GetPoints() int {
-	// Higher protein = more positive points
-	if p > 5 {
-		return 5
-	}
-	return 1
-}
-
-// NutritionalData contains all the nutritional information needed for scoring
-// This struct holds the complete nutritional profile of a food item
-type NutritionalData struct {
-	Energy              EnergyKJ            // Energy content in kJ
-	Sugars              SugarGram           // Sugar content in grams
-	SaturatedFattyAcids SaturatedFattyAcids // Saturated fat content in grams
-	Sodium              SodiumMilligram     // Sodium content in milligrams
-	Fruits              FruitsPercent       // Fruits/vegetables/nuts percentage
-	Fibre               FibreGram           // Fiber content in grams
-	Protein             ProteinGram         // Protein content in grams
-}
-
-// GetNutritionalScore calculates the nutritional score based on the provided data and score type
-// This is the main scoring function that implements the nutritional scoring algorithm
+// GetNutritionalScore calculates the nutritional score using the enhanced scoring engine
+// This function now uses the official Nutri-Score algorithm with proper validation
 func GetNutritionalScore(n NutritionalData, st ScoreType) NutritionalScore {
-	// Initialize scoring variables
-	value := 0    // Final score value
-	positive := 0 // Positive points (beneficial nutrients)
-	negative := 0 // Negative points (nutrients to limit)
-
-	// Water doesn't get scored, all other types do
-	// This follows the Nutri-Score standard where water has no nutritional score
-	if st != Water {
-		// Calculate positive points from beneficial nutrients
-		fruitPoints := n.Fruits.GetPoints()
-		fibrePoints := n.Fibre.GetPoints()
-		proteinPoints := n.Protein.GetPoints()
-		positive = fruitPoints + fibrePoints + proteinPoints
-		
-		// Calculate negative points from nutrients to limit
-		// These are nutrients that should be consumed in moderation
-		negative = n.Energy.GetPoints() + n.Sugars.GetPoints() + 
-				  n.SaturatedFattyAcids.GetPoints() + n.Sodium.GetPoints()
-		
-		// Final score is negative points minus positive points
-		// Lower scores are better (more healthy)
-		value = negative - positive
+	// Create the enhanced nutritional scorer with official algorithm
+	scorer := core.NewNutritionalScorer()
+	
+	// Calculate the score using the official Nutri-Score algorithm
+	// This includes proper validation and grade assignment
+	result, err := scorer.CalculateScore(n, st)
+	if err != nil {
+		// If there's a validation error, return a default score with error indication
+		// In a real application, this error should be handled properly
+		return NutritionalScore{
+			Value:     999, // High value indicates error
+			Grade:     "E", // Worst grade for invalid data
+			Positive:  0,
+			Negative:  0,
+			ScoreType: st,
+		}
 	}
-
-	return NutritionalScore{
-		Value:     value,
-		Positive:  positive,
-		Negative:  negative,
-		ScoreType: st,
+	
+	return result
+}
+// 
+ValidateNutritionalData validates nutritional data and returns user-friendly error messages
+// This function provides a simple interface for validation in the CLI
+func ValidateNutritionalData(n NutritionalData) []string {
+	validator := core.NewInputValidator()
+	validationErrors := validator.ValidateNutritionalData(n)
+	
+	// Convert validation errors to simple string messages for CLI display
+	var messages []string
+	for _, err := range validationErrors {
+		messages = append(messages, err.Message)
 	}
+	
+	return messages
+}
+
+// GetScoreGrade converts a numerical score to a letter grade using official thresholds
+// This provides a simple interface to the enhanced scoring system
+func GetScoreGrade(score int) string {
+	scorer := core.NewNutritionalScorer()
+	return scorer.GetScoreGrade(score)
+}
+
+// GetScoreThresholds returns the official Nutri-Score grade thresholds
+// Useful for displaying grade information to users
+func GetScoreThresholds() map[string]int {
+	scorer := core.NewNutritionalScorer()
+	return scorer.GetScoreThresholds()
 }
