@@ -52,7 +52,11 @@
     - Create validation helper functions
     - _Requirements: 1.3, 4.3_
 
-  - [ ]* 3.3 Write unit tests for scoring engine
+  - [-] 3.3 Write unit tests for scoring engine
+
+
+
+
     - Test scoring algorithms with various food types
     - Validate edge cases and boundary conditions
     - Test grade calculation accuracy
