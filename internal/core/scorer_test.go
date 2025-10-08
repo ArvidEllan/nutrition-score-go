@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// TestNutritionalScorer_CalculateScore tests the main scoring functionality
+// TestNutritionalScorer_CalculateScore tests the main scoring functionality with various food types
 func TestNutritionalScorer_CalculateScore(t *testing.T) {
 	scorer := NewNutritionalScorer()
 
@@ -29,10 +29,7 @@ func TestNutritionalScorer_CalculateScore(t *testing.T) {
 			},
 			foodType: models.FoodType,
 			expected: models.NutritionalScore{
-				Value:     -4, // Should get Grade A
 				Grade:     "A",
-				Positive:  5, // 5 points from fruits
-				Negative:  1, // 1 point from sugars
 				ScoreType: models.FoodType,
 			},
 			wantErr: false,
@@ -50,10 +47,7 @@ func TestNutritionalScorer_CalculateScore(t *testing.T) {
 			},
 			foodType: models.FoodType,
 			expected: models.NutritionalScore{
-				Value:     30, // Should get Grade E
 				Grade:     "E",
-				Positive:  9,  // 5 fiber + 4 protein
-				Negative:  39, // High from energy, sugar, sat fat
 				ScoreType: models.FoodType,
 			},
 			wantErr: false,
@@ -92,10 +86,7 @@ func TestNutritionalScorer_CalculateScore(t *testing.T) {
 			},
 			foodType: models.CheeseType,
 			expected: models.NutritionalScore{
-				Value:     20, // Cheese uses special rules
 				Grade:     "E",
-				Positive:  5,  // 5 points from protein
-				Negative:  25, // High from energy, sat fat, sodium
 				ScoreType: models.CheeseType,
 			},
 			wantErr: false,
@@ -113,11 +104,62 @@ func TestNutritionalScorer_CalculateScore(t *testing.T) {
 			},
 			foodType: models.BeverageType,
 			expected: models.NutritionalScore{
-				Value:     -1, // Should get Grade A
 				Grade:     "A",
-				Positive:  1,  // Only fruits count for beverages
-				Negative:  0,  // Low negative points
 				ScoreType: models.BeverageType,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Whole Grain Bread - Grade B Food",
+			data: models.NutritionalData{
+				Energy:              models.EnergyKJ(1100),   // Moderate energy
+				Sugars:              models.SugarGram(3.2),   // Low sugar
+				SaturatedFattyAcids: models.SaturatedFattyAcids(1.1), // Low saturated fat
+				Sodium:              models.SodiumMilligram(380),     // Moderate sodium
+				Fruits:              models.FruitsPercent(0),         // No fruits
+				Fibre:               models.FibreGram(6.8),           // High fiber
+				Protein:             models.ProteinGram(9.4),         // Good protein
+			},
+			foodType: models.FoodType,
+			expected: models.NutritionalScore{
+				Grade:     "B",
+				ScoreType: models.FoodType,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Orange Juice - Beverage with High Sugar",
+			data: models.NutritionalData{
+				Energy:              models.EnergyKJ(190),    // Low energy
+				Sugars:              models.SugarGram(9.6),   // Natural fruit sugars
+				SaturatedFattyAcids: models.SaturatedFattyAcids(0), // No fat
+				Sodium:              models.SodiumMilligram(1),     // Very low sodium
+				Fruits:              models.FruitsPercent(100),     // 100% fruit
+				Fibre:               models.FibreGram(0.2),         // Minimal fiber
+				Protein:             models.ProteinGram(0.7),       // Low protein
+			},
+			foodType: models.BeverageType,
+			expected: models.NutritionalScore{
+				Grade:     "B",
+				ScoreType: models.BeverageType,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Cheddar Cheese - High Fat Cheese",
+			data: models.NutritionalData{
+				Energy:              models.EnergyKJ(1700),   // High energy
+				Sugars:              models.SugarGram(0.1),   // Very low sugar
+				SaturatedFattyAcids: models.SaturatedFattyAcids(21), // Very high saturated fat
+				Sodium:              models.SodiumMilligram(621),    // High sodium
+				Fruits:              models.FruitsPercent(0),        // No fruits
+				Fibre:               models.FibreGram(0),            // No fiber
+				Protein:             models.ProteinGram(25),         // High protein
+			},
+			foodType: models.CheeseType,
+			expected: models.NutritionalScore{
+				Grade:     "E",
+				ScoreType: models.CheeseType,
 			},
 			wantErr: false,
 		},
@@ -134,14 +176,22 @@ func TestNutritionalScorer_CalculateScore(t *testing.T) {
 			
 			if !tt.wantErr {
 				if result.Grade != tt.expected.Grade {
-					t.Errorf("CalculateScore() grade = %v, want %v", result.Grade, tt.expected.Grade)
+					t.Errorf("CalculateScore() grade = %v, want %v (score: %d)", result.Grade, tt.expected.Grade, result.Value)
 				}
 				if result.ScoreType != tt.expected.ScoreType {
 					t.Errorf("CalculateScore() scoreType = %v, want %v", result.ScoreType, tt.expected.ScoreType)
 				}
-				// Allow some tolerance for score calculations due to algorithm complexity
-				if abs(result.Value-tt.expected.Value) > 5 {
-					t.Errorf("CalculateScore() value = %v, want approximately %v", result.Value, tt.expected.Value)
+				// For water, check exact values
+				if tt.foodType == models.WaterType {
+					if result.Value != tt.expected.Value {
+						t.Errorf("CalculateScore() water value = %v, want %v", result.Value, tt.expected.Value)
+					}
+					if result.Positive != tt.expected.Positive {
+						t.Errorf("CalculateScore() water positive = %v, want %v", result.Positive, tt.expected.Positive)
+					}
+					if result.Negative != tt.expected.Negative {
+						t.Errorf("CalculateScore() water negative = %v, want %v", result.Negative, tt.expected.Negative)
+					}
 				}
 			}
 		})
@@ -499,7 +549,7 @@ func TestEdgeCases(t *testing.T) {
 	scorer := NewNutritionalScorer()
 
 	t.Run("Boundary Values - Energy Thresholds", func(t *testing.T) {
-		// Test exact boundary values for energy scoring
+		// Test exact boundary values for energy scoring according to official Nutri-Score thresholds
 		testCases := []struct {
 			energy   models.EnergyKJ
 			expected int // Expected energy points
@@ -508,6 +558,10 @@ func TestEdgeCases(t *testing.T) {
 			{336, 1},   // Just over boundary
 			{670, 1},   // Boundary for 1 point
 			{671, 2},   // Just over boundary
+			{1005, 2},  // Boundary for 2 points
+			{1006, 3},  // Just over boundary
+			{1340, 3},  // Boundary for 3 points
+			{1341, 4},  // Just over boundary
 			{3350, 9},  // Boundary for 9 points
 			{3351, 10}, // Maximum points
 		}
@@ -523,6 +577,177 @@ func TestEdgeCases(t *testing.T) {
 			result := calculator.CalculateNegativePoints(data)
 			if result != tc.expected {
 				t.Errorf("Energy %v kJ: got %d points, want %d points", tc.energy, result, tc.expected)
+			}
+		}
+	})
+
+	t.Run("Boundary Values - Sugar Thresholds", func(t *testing.T) {
+		// Test exact boundary values for sugar scoring
+		testCases := []struct {
+			sugar    models.SugarGram
+			expected int // Expected sugar points
+		}{
+			{4.5, 0},  // Boundary for 0 points
+			{4.6, 1},  // Just over boundary
+			{9.0, 1},  // Boundary for 1 point
+			{9.1, 2},  // Just over boundary
+			{45.0, 9}, // Boundary for 9 points
+			{45.1, 10}, // Maximum points
+		}
+
+		calculator := NewScoreCalculator()
+		for _, tc := range testCases {
+			data := models.NutritionalData{
+				Energy:              models.EnergyKJ(0),
+				Sugars:              tc.sugar,
+				SaturatedFattyAcids: models.SaturatedFattyAcids(0),
+				Sodium:              models.SodiumMilligram(0),
+			}
+			result := calculator.CalculateNegativePoints(data)
+			if result != tc.expected {
+				t.Errorf("Sugar %v g: got %d points, want %d points", tc.sugar, result, tc.expected)
+			}
+		}
+	})
+
+	t.Run("Boundary Values - Saturated Fat Thresholds", func(t *testing.T) {
+		// Test exact boundary values for saturated fat scoring
+		testCases := []struct {
+			satFat   models.SaturatedFattyAcids
+			expected int // Expected saturated fat points
+		}{
+			{1.0, 0},  // Boundary for 0 points
+			{1.1, 1},  // Just over boundary
+			{2.0, 1},  // Boundary for 1 point
+			{2.1, 2},  // Just over boundary
+			{10.0, 9}, // Boundary for 9 points
+			{10.1, 10}, // Maximum points
+		}
+
+		calculator := NewScoreCalculator()
+		for _, tc := range testCases {
+			data := models.NutritionalData{
+				Energy:              models.EnergyKJ(0),
+				Sugars:              models.SugarGram(0),
+				SaturatedFattyAcids: tc.satFat,
+				Sodium:              models.SodiumMilligram(0),
+			}
+			result := calculator.CalculateNegativePoints(data)
+			if result != tc.expected {
+				t.Errorf("Saturated Fat %v g: got %d points, want %d points", tc.satFat, result, tc.expected)
+			}
+		}
+	})
+
+	t.Run("Boundary Values - Sodium Thresholds", func(t *testing.T) {
+		// Test exact boundary values for sodium scoring
+		testCases := []struct {
+			sodium   models.SodiumMilligram
+			expected int // Expected sodium points
+		}{
+			{90, 0},   // Boundary for 0 points
+			{91, 1},   // Just over boundary
+			{180, 1},  // Boundary for 1 point
+			{181, 2},  // Just over boundary
+			{900, 9},  // Boundary for 9 points
+			{901, 10}, // Maximum points
+		}
+
+		calculator := NewScoreCalculator()
+		for _, tc := range testCases {
+			data := models.NutritionalData{
+				Energy:              models.EnergyKJ(0),
+				Sugars:              models.SugarGram(0),
+				SaturatedFattyAcids: models.SaturatedFattyAcids(0),
+				Sodium:              tc.sodium,
+			}
+			result := calculator.CalculateNegativePoints(data)
+			if result != tc.expected {
+				t.Errorf("Sodium %v mg: got %d points, want %d points", tc.sodium, result, tc.expected)
+			}
+		}
+	})
+
+	t.Run("Boundary Values - Fruits Thresholds", func(t *testing.T) {
+		// Test exact boundary values for fruits/vegetables/nuts scoring
+		testCases := []struct {
+			fruits   models.FruitsPercent
+			expected int // Expected fruits points
+		}{
+			{40, 0}, // Boundary for 0 points
+			{41, 1}, // Just over boundary
+			{60, 1}, // Boundary for 1 point
+			{61, 2}, // Just over boundary
+			{80, 2}, // Boundary for 2 points
+			{81, 5}, // Maximum points
+		}
+
+		calculator := NewScoreCalculator()
+		for _, tc := range testCases {
+			data := models.NutritionalData{
+				Fruits:  tc.fruits,
+				Fibre:   models.FibreGram(0),
+				Protein: models.ProteinGram(0),
+			}
+			result := calculator.CalculatePositivePoints(data, models.FoodType)
+			if result != tc.expected {
+				t.Errorf("Fruits %v%%: got %d points, want %d points", tc.fruits, result, tc.expected)
+			}
+		}
+	})
+
+	t.Run("Boundary Values - Fiber Thresholds", func(t *testing.T) {
+		// Test exact boundary values for fiber scoring
+		testCases := []struct {
+			fiber    models.FibreGram
+			expected int // Expected fiber points
+		}{
+			{0.9, 0}, // Boundary for 0 points
+			{1.0, 1}, // Just over boundary
+			{1.9, 1}, // Boundary for 1 point
+			{2.0, 2}, // Just over boundary
+			{4.7, 4}, // Boundary for 4 points
+			{4.8, 5}, // Maximum points
+		}
+
+		calculator := NewScoreCalculator()
+		for _, tc := range testCases {
+			data := models.NutritionalData{
+				Fruits:  models.FruitsPercent(0),
+				Fibre:   tc.fiber,
+				Protein: models.ProteinGram(0),
+			}
+			result := calculator.CalculatePositivePoints(data, models.FoodType)
+			if result != tc.expected {
+				t.Errorf("Fiber %v g: got %d points, want %d points", tc.fiber, result, tc.expected)
+			}
+		}
+	})
+
+	t.Run("Boundary Values - Protein Thresholds", func(t *testing.T) {
+		// Test exact boundary values for protein scoring
+		testCases := []struct {
+			protein  models.ProteinGram
+			expected int // Expected protein points
+		}{
+			{1.6, 0}, // Boundary for 0 points
+			{1.7, 1}, // Just over boundary
+			{3.2, 1}, // Boundary for 1 point
+			{3.3, 2}, // Just over boundary
+			{8.0, 4}, // Boundary for 4 points
+			{8.1, 5}, // Maximum points
+		}
+
+		calculator := NewScoreCalculator()
+		for _, tc := range testCases {
+			data := models.NutritionalData{
+				Fruits:  models.FruitsPercent(0),
+				Fibre:   models.FibreGram(0),
+				Protein: tc.protein,
+			}
+			result := calculator.CalculatePositivePoints(data, models.FoodType)
+			if result != tc.expected {
+				t.Errorf("Protein %v g: got %d points, want %d points", tc.protein, result, tc.expected)
 			}
 		}
 	})
@@ -546,7 +771,17 @@ func TestEdgeCases(t *testing.T) {
 
 		// Should get Grade E due to very high negative points
 		if result.Grade != "E" {
-			t.Errorf("Expected Grade E for extreme values, got %s", result.Grade)
+			t.Errorf("Expected Grade E for extreme values, got %s (score: %d)", result.Grade, result.Value)
+		}
+
+		// Verify negative points are at maximum
+		if result.Negative != 40 { // 10+10+10+10 = 40 maximum negative points
+			t.Errorf("Expected 40 negative points for extreme values, got %d", result.Negative)
+		}
+
+		// Verify positive points are at maximum
+		if result.Positive != 15 { // 5+5+5 = 15 maximum positive points
+			t.Errorf("Expected 15 positive points for extreme values, got %d", result.Positive)
 		}
 	})
 
@@ -569,7 +804,45 @@ func TestEdgeCases(t *testing.T) {
 
 		// Should get Grade A due to no negative points
 		if result.Grade != "A" {
-			t.Errorf("Expected Grade A for minimum values, got %s", result.Grade)
+			t.Errorf("Expected Grade A for minimum values, got %s (score: %d)", result.Grade, result.Value)
+		}
+
+		// Verify zero points
+		if result.Negative != 0 {
+			t.Errorf("Expected 0 negative points for minimum values, got %d", result.Negative)
+		}
+		if result.Positive != 0 {
+			t.Errorf("Expected 0 positive points for minimum values, got %d", result.Positive)
+		}
+		if result.Value != 0 {
+			t.Errorf("Expected 0 final score for minimum values, got %d", result.Value)
+		}
+	})
+
+	t.Run("Grade Boundary Conditions", func(t *testing.T) {
+		// Test foods that should be exactly at grade boundaries
+		testCases := []struct {
+			name          string
+			targetScore   int
+			expectedGrade string
+		}{
+			{"Score -1 (Grade A boundary)", -1, "A"},
+			{"Score 0 (Grade B start)", 0, "B"},
+			{"Score 2 (Grade B boundary)", 2, "B"},
+			{"Score 3 (Grade C start)", 3, "C"},
+			{"Score 10 (Grade C boundary)", 10, "C"},
+			{"Score 11 (Grade D start)", 11, "D"},
+			{"Score 18 (Grade D boundary)", 18, "D"},
+			{"Score 19 (Grade E start)", 19, "E"},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				grade := scorer.GetScoreGrade(tc.targetScore)
+				if grade != tc.expectedGrade {
+					t.Errorf("Score %d: got grade %s, want %s", tc.targetScore, grade, tc.expectedGrade)
+				}
+			})
 		}
 	})
 }

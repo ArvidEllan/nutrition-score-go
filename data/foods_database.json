@@ -1,0 +1,292 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-01-08T00:00:00Z",
+  "description": "Embedded food database with nutritional data per 100g",
+  "foods": [
+    {
+      "id": "apple-001",
+      "name": "Apple, raw",
+      "category": "Fruits",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 218,
+        "sugars": 10.4,
+        "saturated_fatty_acids": 0.1,
+        "sodium": 1,
+        "fruits": 100,
+        "fibre": 2.4,
+        "protein": 0.3
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "banana-001",
+      "name": "Banana, raw",
+      "category": "Fruits",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 371,
+        "sugars": 12.2,
+        "saturated_fatty_acids": 0.1,
+        "sodium": 1,
+        "fruits": 100,
+        "fibre": 2.6,
+        "protein": 1.1
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "orange-001",
+      "name": "Orange, raw",
+      "category": "Fruits",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 197,
+        "sugars": 9.4,
+        "saturated_fatty_acids": 0.0,
+        "sodium": 0,
+        "fruits": 100,
+        "fibre": 2.4,
+        "protein": 0.9
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "broccoli-001",
+      "name": "Broccoli, raw",
+      "category": "Vegetables",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 141,
+        "sugars": 1.5,
+        "saturated_fatty_acids": 0.1,
+        "sodium": 33,
+        "fruits": 100,
+        "fibre": 2.6,
+        "protein": 2.8
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "spinach-001",
+      "name": "Spinach, raw",
+      "category": "Vegetables",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 97,
+        "sugars": 0.4,
+        "saturated_fatty_acids": 0.1,
+        "sodium": 79,
+        "fruits": 100,
+        "fibre": 2.2,
+        "protein": 2.9
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "chicken-breast-001",
+      "name": "Chicken breast, skinless, raw",
+      "category": "Meat",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 540,
+        "sugars": 0.0,
+        "saturated_fatty_acids": 1.0,
+        "sodium": 74,
+        "fruits": 0,
+        "fibre": 0.0,
+        "protein": 23.1
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "salmon-001",
+      "name": "Salmon, Atlantic, raw",
+      "category": "Fish",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 628,
+        "sugars": 0.0,
+        "saturated_fatty_acids": 3.1,
+        "sodium": 44,
+        "fruits": 0,
+        "fibre": 0.0,
+        "protein": 20.4
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "whole-wheat-bread-001",
+      "name": "Bread, whole wheat",
+      "category": "Grains",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 1047,
+        "sugars": 5.1,
+        "saturated_fatty_acids": 0.6,
+        "sodium": 540,
+        "fruits": 0,
+        "fibre": 6.0,
+        "protein": 9.0
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "white-rice-001",
+      "name": "Rice, white, cooked",
+      "category": "Grains",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 544,
+        "sugars": 0.1,
+        "saturated_fatty_acids": 0.1,
+        "sodium": 1,
+        "fruits": 0,
+        "fibre": 0.4,
+        "protein": 2.7
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "milk-whole-001",
+      "name": "Milk, whole, 3.25% fat",
+      "category": "Dairy",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 252,
+        "sugars": 5.1,
+        "saturated_fatty_acids": 1.9,
+        "sodium": 40,
+        "fruits": 0,
+        "fibre": 0.0,
+        "protein": 3.2
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "cheddar-cheese-001",
+      "name": "Cheese, cheddar",
+      "category": "Dairy",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 1673,
+        "sugars": 0.5,
+        "saturated_fatty_acids": 21.1,
+        "sodium": 621,
+        "fruits": 0,
+        "fibre": 0.0,
+        "protein": 25.0
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "almonds-001",
+      "name": "Almonds, raw",
+      "category": "Nuts",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 2423,
+        "sugars": 4.4,
+        "saturated_fatty_acids": 3.8,
+        "sodium": 1,
+        "fruits": 80,
+        "fibre": 12.5,
+        "protein": 21.2
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "olive-oil-001",
+      "name": "Oil, olive, extra virgin",
+      "category": "Oils",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 3701,
+        "sugars": 0.0,
+        "saturated_fatty_acids": 13.8,
+        "sodium": 2,
+        "fruits": 0,
+        "fibre": 0.0,
+        "protein": 0.0
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    },
+    {
+      "id": "coca-cola-001",
+      "name": "Coca-Cola, regular",
+      "category": "Beverages",
+      "brand": "Coca-Cola",
+      "nutritional_data": {
+        "energy": 180,
+        "sugars": 10.6,
+        "saturated_fatty_acids": 0.0,
+        "sodium": 4,
+        "fruits": 0,
+        "fibre": 0.0,
+        "protein": 0.0
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "Brand"
+    },
+    {
+      "id": "water-001",
+      "name": "Water, tap",
+      "category": "Beverages",
+      "brand": "",
+      "nutritional_data": {
+        "energy": 0,
+        "sugars": 0.0,
+        "saturated_fatty_acids": 0.0,
+        "sodium": 7,
+        "fruits": 0,
+        "fibre": 0.0,
+        "protein": 0.0
+      },
+      "is_user_defined": false,
+      "created_at": "2025-01-08T00:00:00Z",
+      "updated_at": "2025-01-08T00:00:00Z",
+      "source": "USDA"
+    }
+  ]
+}
